@@ -1,8 +1,15 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
-import { createGlobalStyle } from 'styled-components';
-import { TodosComponent } from "./todos/todos.component";
+import * as React              from "react";
+import * as ReactDOM           from "react-dom";
+import { createGlobalStyle }   from 'styled-components';
+import { TodosComponent }      from "./todos/todos.component";
+import { Provider, connect }   from 'react-redux';
+import storeFactory            from './store';
+import { Dispatch }            from "redux";
+import { Todo }                from "@interfaces";
+import { fetchTodos, addTodo, editTodo } from "./actions";
 
+const store = storeFactory();
+store.dispatch((fetchTodos() as any))
 /**
  * Example global styles
  */
@@ -20,26 +27,30 @@ const GlobalStyle = createGlobalStyle`
         justify-items: center;
         margin-top: 15vh;
     }
-`
+`;
 
-const todos = [
-    {
-        id: 1,
-        text: 'test 1',
-        done: true
+const mapStateToProps = (state: any) => {
+    const { todos } = state;
+    return { todos,  };
+};
+
+const mapDispatchers = (dispatch: Dispatch) => ({
+    onCreate(todo: Todo) {
+        dispatch((addTodo(todo) as any));
     },
-    {
-        id: 2,
-        text: 'test 2',
-        done: false
+    onEdit(todo: Todo) {
+        dispatch((editTodo(todo) as any));
     }
-]
+});
+
+const TodoList = connect(mapStateToProps, mapDispatchers)(TodosComponent);
+
 
 ReactDOM.render(
-        <div>
+        <Provider store={store}>
             <GlobalStyle />
             <h1>TODOS</h1>
-            <TodosComponent todos={todos}></TodosComponent>
-        </div>,
+            <TodoList />
+        </Provider>,
     document.getElementById("app-root")
 );
