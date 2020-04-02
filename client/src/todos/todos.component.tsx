@@ -2,13 +2,15 @@ import * as React    from 'react'
 import { Component } from "react";
 import styled        from 'styled-components';
 import { Todo }      from '@interfaces';
+import { DispatchProp } from 'react-redux';
 
 export interface TodosComponentProps {
-    todos: Todo[]
+    todos: Todo[],
+    onCreate: any,
+    onEdit: any
 }
 
 interface TodosComponentState {
-    todos: Todo[]
     newTodo: string
 };
 
@@ -51,7 +53,6 @@ export class TodosComponent extends Component<TodosComponentProps, TodosComponen
         const { todos } = props;
         // This is the only time it's safe to directly set the state! Otherwise use this.setState().
         this.state = {
-            todos,
             newTodo: ''
         };
     }
@@ -61,14 +62,8 @@ export class TodosComponent extends Component<TodosComponentProps, TodosComponen
      * @param event 
      */
     private addTodo(): void {
-        const { newTodo, todos } = this.state;
-
-        todos.push({id: (todos.length + 1), text: newTodo, done: false });
-        const newState = {
-            todos,
-            newTodo: ''
-        }
-        this.setState(newState);
+        const { newTodo } = this.state;
+        this.props.onCreate({ text: newTodo, done: false });
     }
 
     /**
@@ -76,13 +71,10 @@ export class TodosComponent extends Component<TodosComponentProps, TodosComponen
      * @param index 
      */
     private toggleDone(index: number) {
-        const { todos } = this.state;
+        const { todos } = this.props;
         todos[index].done = !todos[index].done;
         
-        this.setState({
-            ...this.state,
-            todos
-        });
+        this.props.onEdit(todos[index]);
     }
 
     /**
@@ -109,7 +101,8 @@ export class TodosComponent extends Component<TodosComponentProps, TodosComponen
     public render() {
 
         // Object destructuring is great for referencing props and state in templates too.
-        const { todos, newTodo } = this.state;
+        const { newTodo } = this.state;
+        const { todos }   = this.props;
 
         return (
             <TodosWrapper>

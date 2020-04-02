@@ -36,10 +36,10 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchers = (dispatch: Dispatch) => ({
     onCreate(todo: Todo) {
-        dispatch((addTodo(todo) as any));
+        return dispatch((addTodo(todo) as any));
     },
     onEdit(todo: Todo) {
-        dispatch((editTodo(todo) as any));
+        return dispatch((editTodo(todo) as any));
     }
 });
 
