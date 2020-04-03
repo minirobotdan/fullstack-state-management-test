@@ -39,7 +39,7 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(cookieParser(secret));
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", '*');
+    res.header("Access-Control-Allow-Origin", 'http://localhost:9001');
     res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
     res.header("Access-Control-Allow-Headers", "Content-Type");
     res.header("Access-Control-Allow-Credentials", "true");
@@ -60,6 +60,24 @@ const createTodo = async(todo: Todo): Promise<void> => {
     const id = uuidv4();
     todo.id = id;
     redisClient.rpush('todos', JSON.stringify(todo));
+}
+
+const updateTodo = async(id: string, todo: Todo): Promise<boolean> => {
+    const todos: Todo[] = await getTodos();
+    const resultIndex = todos.map(e => e.id).indexOf(id);
+    
+    if(resultIndex !== -1) {
+        const result = todos[resultIndex];
+        const updatedTodo = {
+            ...result,
+            ...todo
+        };
+    
+        return redisClient.lset('todos', resultIndex, JSON.stringify(updatedTodo));
+    } else {
+        throw('Todo not found.');
+    }
+   
 }
 
 
@@ -92,9 +110,27 @@ app.post('/', async (req: express.Request, res: express.Response) => {
     }
 });
 
+app.put('/:id', async (req: express.Request, res: express.Response) => {
+    try {
+        if(!req.body?.text) {
+            res.statusCode = 400;
+            res.send('Todo must have a description');
+        } else {
+            const todo: Todo = req.body;
+            await updateTodo(req.params.id, todo);
+            socket.emit('updated', req.sessionID);
+            res.json('Todo added successfully');
+        }
+        
+    } catch(e) {
+        res.statusCode = 500;
+        res.send(e);
+    }
+});
+
 
 // HTTP & Socket Listeners
-app.listen(3000, () => console.log('REST listening on port 3000'));
+server.listen(3000, () => console.log('REST listening on port 3000'));
 
 socket.on('connection', () => {
     console.log('A user connected');

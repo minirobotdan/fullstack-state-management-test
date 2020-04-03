@@ -1,5 +1,6 @@
 import * as React              from "react";
 import * as ReactDOM           from "react-dom";
+import * as socketIOClient     from "socket.io-client";
 import { createGlobalStyle }   from 'styled-components';
 import { TodosComponent }      from "./todos/todos.component";
 import { Provider, connect }   from 'react-redux';
@@ -9,7 +10,10 @@ import { Todo }                from "@interfaces";
 import { fetchTodos, addTodo, editTodo } from "./actions";
 
 const store = storeFactory();
-store.dispatch((fetchTodos() as any))
+store.dispatch((fetchTodos() as any));
+
+const socket = socketIOClient('localhost:3000');
+socket.on("updated", (data: any) => console.log(data));
 /**
  * Example global styles
  */
