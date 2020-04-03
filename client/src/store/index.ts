@@ -7,6 +7,10 @@ import {
 import { todos } from './reducers'
 import thunk     from 'redux-thunk'
 
+/**
+ * Persist state in localstorage
+ * @param store 
+ */
 const saver = (store: Store) => (next: (arg0: any) => any) => (action: any) => {
     let result = next(action)
     localStorage['redux-store'] = JSON.stringify(store.getState())

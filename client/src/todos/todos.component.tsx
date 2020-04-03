@@ -2,7 +2,6 @@ import * as React    from 'react'
 import { Component } from "react";
 import styled        from 'styled-components';
 import { Todo }      from '@interfaces';
-import { DispatchProp } from 'react-redux';
 
 export interface TodosComponentProps {
     todos: Todo[],
@@ -100,7 +99,6 @@ export class TodosComponent extends Component<TodosComponentProps, TodosComponen
 
     public render() {
 
-        // Object destructuring is great for referencing props and state in templates too.
         const { newTodo } = this.state;
         const { todos }   = this.props;
 

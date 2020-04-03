@@ -12,8 +12,13 @@ import { fetchTodos, addTodo, editTodo } from "./actions";
 const store = storeFactory();
 store.dispatch((fetchTodos() as any));
 
+// Set up socket client
 const socket = socketIOClient('localhost:3000');
-socket.on("updated", (data: any) => console.log(data));
+socket.on("updated", (data: any) => {
+    console.log(data);
+    store.dispatch((fetchTodos() as any));
+});
+
 /**
  * Example global styles
  */
@@ -47,14 +52,14 @@ const mapDispatchers = (dispatch: Dispatch) => ({
     }
 });
 
+// High order component to pass in Redux bits and pieces
 const TodoList = connect(mapStateToProps, mapDispatchers)(TodosComponent);
 
-
 ReactDOM.render(
-        <Provider store={store}>
-            <GlobalStyle />
-            <h1>TODOS</h1>
-            <TodoList />
-        </Provider>,
+    <Provider store={store}>
+        <GlobalStyle />
+        <h1>TODOS</h1>
+        <TodoList />
+    </Provider>,
     document.getElementById("app-root")
 );
